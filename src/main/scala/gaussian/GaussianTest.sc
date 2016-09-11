@@ -42,7 +42,6 @@ def kfunc(x: MyNum, xPrime: MyNum) = {
   k
 }
 
-
 def covarianceK(inputRow: DenseVector[MyNum]): DenseMatrix[MyNum] = {
   val len = inputRow.length
   val covarM = DenseMatrix.zeros[MyNum](len, len)
@@ -87,7 +86,10 @@ val secondColumn = inputs(::,1)
   */
 
 val kStarRow = kStarVec.asDenseMatrix
-val yDistrib = kStarRow * (k \ secondColumn)
+val yMean = kStarRow * (k \ secondColumn)
 
 val yVarianceRHS = (kStarRow * breeze.linalg.inv(k)*kStarRow.t)
 val yVariance = kStarStarScalar - yVarianceRHS
+
+val y = yMean(0)
+val variance = yVariance(0,0)
