@@ -2,6 +2,7 @@ package gaussian
 
 import breeze.linalg.{DenseMatrix, eigSym, min}
 import gaussian.Gaussian.Location
+import breeze.stats.median
 
 object Main {
 
@@ -15,20 +16,21 @@ object Main {
 
     // TODO: split data into training and test sets
     val trainingSet = data(1 to dataSize, ::)
-    //println(s"${trainingSet.rows} by ${trainingSet.cols}")
-    //println(trainingSet)
-
     println("calculating covariance")
-    val k = Gaussian.getK(trainingSet)
+    val kAndDist = Gaussian.getK(trainingSet)
     //println(k)
 
+    val medDistance = breeze.stats.median(kAndDist._2)
+
+    println(s"median distance (use this for bandwidth param) = ${medDistance}")
+
     println("calculating eigen")
-    val eigen = eigSym(k)
+    val eigen = eigSym(kAndDist._1)
     println(s"smallest eigenvalue ${min(eigen.eigenvalues)}")
 
     println("calculating predictions")
     val testLoc = Location(data(testItemIndex, 1), data(testItemIndex, 0))
-    val prediction = Gaussian.getPrediction(k, testLoc, trainingSet, 2)
+    val prediction = Gaussian.getPrediction(kAndDist._1, testLoc, trainingSet, 2)
     println(s"predicted=$prediction")
     println(s"actual=${data(testItemIndex, 2)}")
   }

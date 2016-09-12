@@ -11,14 +11,13 @@ object Gaussian {
   // eventually this case class will have more params like moisture/rain etc at location
   case class Location(lat: MyNum, long: MyNum)
 
-  // TODO: tweak these params
-  val l: MyNum = 1
+  val bandwidth: MyNum = 0.03950030314700339
   val sigma_n = 0.03
   val sigma_f = 1.27
 
   def kfunc(loc: Location, locPrime: Location) = {
     val distance = haversine(loc, locPrime)
-    val minus = -1 * distance * distance
+    val minus = (-1 * distance * distance) / (2 * bandwidth * bandwidth)
     //val k = pow(sigma_f,2)*exp(minus)
     val k = exp(minus)
 
@@ -28,25 +27,30 @@ object Gaussian {
       k
   }
 
-  def covarianceK(data: DenseMatrix[MyNum], latColumn: Int, longColumn: Int): DenseMatrix[MyNum] = {
+  // returns the covariance matrix
+  // and also the distance matrix (the latter is used for estimating bandwidth)
+  def covarianceK(data: DenseMatrix[MyNum], latColumn: Int, longColumn: Int):
+  (DenseMatrix[MyNum], DenseMatrix[MyNum]) = {
     val len = data.rows
     val covarM = DenseMatrix.zeros[MyNum](len, len)
+    val distances = DenseMatrix.zeros[MyNum](len, len)
 
     for (i <- 0 until len) {
       for (j <- 0 until len) {
         val locationI = Location(data(i,latColumn), data(i,longColumn))
         val locationJ = Location(data(j,latColumn), data(j,longColumn))
         covarM(i, j) = kfunc(locationI, locationJ)
+        distances(i, j) = haversine(locationI, locationJ)
       }
     }
 
-    covarM
+    (covarM, distances)
   }
 
   // first column is longitude
   // second column is latitude
   // third column is yield
-  def getK(data: DenseMatrix[MyNum]): DenseMatrix[MyNum] =
+  def getK(data: DenseMatrix[MyNum]): (DenseMatrix[MyNum], DenseMatrix[MyNum]) =
     covarianceK(data, 1, 0)
 
   def getKStar(testLocation: Location,
