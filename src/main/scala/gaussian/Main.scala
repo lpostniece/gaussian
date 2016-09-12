@@ -1,6 +1,7 @@
 package gaussian
 
 import breeze.linalg.{DenseMatrix, eigSym, min}
+import gaussian.Gaussian.Location
 
 object Main {
 
@@ -23,13 +24,11 @@ object Main {
 
     println("calculating eigen")
     val eigen = eigSym(k)
-    println(eigen.eigenvalues)
     println(s"smallest eigenvalue ${min(eigen.eigenvalues)}")
 
     println("calculating predictions")
-    val kStar = Gaussian.getKStar(data(testItemIndex, 1), data(testItemIndex, 0), trainingSet, k)
-    val kStarStar = Gaussian.getKStarStar(data(testItemIndex, 1), data(testItemIndex, 0))
-    val prediction = Gaussian.getPrediction(kStar, k, kStarStar, trainingSet)
+    val testLoc = Location(data(testItemIndex, 1), data(testItemIndex, 0))
+    val prediction = Gaussian.getPrediction(k, testLoc, trainingSet, 2)
     println(s"predicted=$prediction")
     println(s"actual=${data(testItemIndex, 2)}")
   }
