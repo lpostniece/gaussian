@@ -65,25 +65,18 @@ object Gaussian {
 
   case class Prediction(mean: MyNum, variance: MyNum)
 
-  def getPrediction(kStarVec: DenseVector[MyNum],
-                    k: DenseMatrix[MyNum],
-                    kStarStarScalar: MyNum,
-                    outputData: DenseVector[MyNum]): Prediction = {
-    val kStarRow = kStarVec.asDenseMatrix
-    val yMean = kStarRow * (k \ outputData)
-
-    val yVarianceRHS = (kStarRow * breeze.linalg.inv(k)*kStarRow.t)
-    val yVariance = kStarStarScalar - yVarianceRHS
-
-    Prediction(yMean(0), yVariance(0,0))
-  }
-
   def getPrediction(k: DenseMatrix[MyNum],
                     testLocation: Location,
                     trainingData: DenseMatrix[MyNum],
                     outputColumn: Int) : Prediction = {
     val kStar = getKStar(testLocation, trainingData, k)
     val kStarStar = getKStarStar(testLocation)
-    getPrediction(kStar, k, kStarStar, trainingData(::, outputColumn))
+    val kStarRow = kStar.asDenseMatrix
+    val yMean = kStarRow * (k \ trainingData(::, outputColumn))
+
+    val yVarianceRHS = (kStarRow * breeze.linalg.inv(k)*kStarRow.t)
+    val yVariance = kStarStar - yVarianceRHS
+
+    Prediction(yMean(0), yVariance(0,0))
   }
 }
