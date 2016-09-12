@@ -13,7 +13,7 @@ object Main {
 
     val testSetIndices = for {
       i <- 0 until dataSize
-      if (i % 10 == 0)
+      if (i % 10 != 0)
     } yield i
 
     // remove test indices from training set
@@ -21,7 +21,7 @@ object Main {
 
     val trainingSetIndices = for {
       i <- 0 until dataSize
-      if (i % 10 != 0)
+      if (i % 10 == 0)
     } yield i
 
     // remove training indices from test set
