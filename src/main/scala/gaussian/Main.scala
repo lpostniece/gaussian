@@ -1,8 +1,9 @@
 package gaussian
 
-import breeze.linalg.{Axis, DenseMatrix, eigSym, min}
+import breeze.linalg.{Axis, DenseMatrix, DenseVector, eigSym, min}
+import breeze.plot.{Figure, Plot}
 import gaussian.Gaussian.{Location, MyNum}
-import breeze.stats.median
+import breeze.stats.{median}
 
 object Main {
 
@@ -54,13 +55,35 @@ object Main {
 
     println("calculating predictions for all values in test set")
 
-    for (i <- 0 until testSet.rows) {
+    // long, lat, prediction, actual, error
+    val predsForCSV = new DenseMatrix[MyNum](testSet.rows, 5)
+
+    val predictions = for (i <- 0 until testSet.rows) {
       val testLoc = Location(data(i, 1), data(i, 0))
       val prediction = Gaussian.getPrediction(kAndDist._1, testLoc, trainingSet, 2)
       val actual = data(i, 2)
       val err: MyNum = math.abs((prediction.mean - actual) / actual)
-      println(s"predicted=$prediction, actual=$actual, error = $err")
+      predsForCSV(i,0) = testLoc.long
+      predsForCSV(i,1) = testLoc.lat
+      predsForCSV(i,2) = prediction.mean
+      predsForCSV(i,3) = actual
+      predsForCSV(i,4) = err
+      //println(s"predicted=$prediction, actual=$actual, error = $err")
     }
+
+    /*val errVec = new DenseVector[MyNum](predictionErrors.toArray)
+    val fig = Figure()
+    val p: Plot = fig.subplot(0)
+    p += breeze.plot.hist(errVec, 20)
+    p.ylabel = "number of errors"
+    p.xlabel = "error"
+    p.xaxis.setTickLabelsVisible(true)
+    p.title = s"Prediction errors: ${trainingSet.rows} training rows, ${testSet.rows} test rows"
+    fig.saveas("prediction_errors.png")*/
+
+
+    Utils.matrixToCSV(predsForCSV, "output.csv")
+    println(s"results written to output.csv")
 
   }
 

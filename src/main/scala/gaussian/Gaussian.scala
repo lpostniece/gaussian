@@ -1,6 +1,7 @@
 package gaussian
 
 import breeze.linalg.{DenseMatrix, DenseVector}
+import breeze.plot._
 import math._
 import Haversine._
 
