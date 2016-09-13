@@ -8,31 +8,7 @@ import org.jfree.chart.axis.NumberTickUnit
 
 object Main {
 
-  def getTrainingAndTestSets(data: DenseMatrix[MyNum], dataSize: Int) : (DenseMatrix[MyNum], DenseMatrix[MyNum]) = {
-    // now delete some rows from test data and some rows from training data
-    var trainingSet = data(1 to dataSize, ::)
-    var testSet = trainingSet.copy
 
-    val testSetIndices = for {
-      i <- 0 until dataSize
-      if (i % 10 != 0)
-    } yield i
-
-    // remove test indices from training set
-    trainingSet = trainingSet.delete(testSetIndices, Axis._0)
-
-    val trainingSetIndices = for {
-      i <- 0 until dataSize
-      if (i % 10 == 0)
-    } yield i
-
-    // remove training indices from test set
-    testSet = testSet.delete(trainingSetIndices, Axis._0)
-
-    println(s"data split into training set of size ${trainingSet.rows} and test set of size ${testSet.rows}")
-
-    (trainingSet, testSet)
-  }
 
   def main(args: Array[String]): Unit = {
     val fileName = args(0)
@@ -41,7 +17,7 @@ object Main {
     val data = Utils.csvToMatrix(fileName)
     println(s"${data.rows} by ${data.cols}")
 
-    val (trainingSet, testSet) = getTrainingAndTestSets(data, dataSize)
+    val (trainingSet, testSet) = Utils.getTrainingAndTestSets(data, dataSize)
 
     println("calculating covariance")
     val kAndDist = Gaussian.getK(trainingSet)

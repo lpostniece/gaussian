@@ -22,3 +22,5 @@ libraryDependencies  ++= Seq(
 resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/"
 
 mainClass in (Compile, run) := Some("gaussian.Main")
+
+libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.4" % "test"
