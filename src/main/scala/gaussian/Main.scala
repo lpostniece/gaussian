@@ -3,7 +3,8 @@ package gaussian
 import breeze.linalg.{Axis, DenseMatrix, DenseVector, eigSym, min}
 import breeze.plot.{Figure, Plot}
 import gaussian.Gaussian.{Location, MyNum}
-import breeze.stats.{median}
+import breeze.stats.median
+import org.jfree.chart.axis.NumberTickUnit
 
 object Main {
 
@@ -71,16 +72,15 @@ object Main {
       //println(s"predicted=$prediction, actual=$actual, error = $err")
     }
 
-    /*val errVec = new DenseVector[MyNum](predictionErrors.toArray)
+    val errVec = predsForCSV(::, 4)
     val fig = Figure()
     val p: Plot = fig.subplot(0)
     p += breeze.plot.hist(errVec, 20)
     p.ylabel = "number of errors"
     p.xlabel = "error"
-    p.xaxis.setTickLabelsVisible(true)
+    p.xaxis.setTickUnit(new NumberTickUnit(0.01))
     p.title = s"Prediction errors: ${trainingSet.rows} training rows, ${testSet.rows} test rows"
-    fig.saveas("prediction_errors.png")*/
-
+    fig.saveas("prediction_errors.png")
 
     Utils.matrixToCSV(predsForCSV, "output.csv")
     println(s"results written to output.csv")
